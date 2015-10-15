@@ -5200,6 +5200,10 @@
 			}
 		},
 		parseTime: function(label) {
+			// Custom parsing (return an instance of moment)
+			if (typeof this.options.time.format !== 'string' && this.options.time.format.call) {
+				return this.options.time.format(label);
+			}
 			// Date objects
 			if (typeof label.getMonth === 'function' || typeof label == 'number') {
 				return moment(label);
@@ -5207,10 +5211,6 @@
 			// Moment support
 			if (label.isValid && label.isValid()) {
 				return label;
-			}
-			// Custom parsing (return an instance of moment)
-			if (typeof this.options.time.format !== 'string' && this.options.time.format.call) {
-				return this.options.time.format(label);
 			}
 			// Moment format parsing
 			return moment(label, this.options.time.format);
