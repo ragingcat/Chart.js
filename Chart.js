@@ -2688,16 +2688,19 @@
 							yPositions.push(element._view.y);
 
 							//Include any colour information about the element
-							labels.push(helpers.template(this._options.tooltips.multiTemplate, {
+							var lb = helpers.template(this._options.tooltips.multiTemplate, {
 								// These variables are available in the template function. Add others here
 								element: element,
 								datasetLabel: this._data.datasets[element._datasetIndex].label,
 								value: this._data.datasets[element._datasetIndex].data[element._index],
-							}));
-							colors.push({
-								fill: element._view.backgroundColor,
-								stroke: element._view.borderColor
 							});
+							if(lb.length){
+								labels.push(lb);
+								colors.push({
+									fill: element._view.backgroundColor,
+									stroke: element._view.borderColor
+								});
+							}
 
 						}, this);
 
@@ -2866,18 +2869,20 @@
 
 					ctx.font = helpers.fontString(vm.fontSize, vm._fontStyle, vm._fontFamily);
 					helpers.each(vm.labels, function(label, index) {
-						ctx.fillStyle = helpers.color(vm.textColor).alpha(vm.opacity).rgbString();
-						ctx.fillText(label, vm.x + vm.xPadding + vm.fontSize + 3, this.getLineHeight(index + 1));
+						if(label.length){
+							ctx.fillStyle = helpers.color(vm.textColor).alpha(vm.opacity).rgbString();
+							ctx.fillText(label, vm.x + vm.xPadding + vm.fontSize + 3, this.getLineHeight(index + 1));
 
 						//A bit gnarly, but clearing this rectangle breaks when using explorercanvas (clears whole canvas)
 						//ctx.clearRect(vm.x + vm.xPadding, this.getLineHeight(index + 1) - vm.fontSize/2, vm.fontSize, vm.fontSize);
 						//Instead we'll make a white filled block to put the legendColour palette over.
+							ctx.fillStyle = helpers.color(vm.legendColors[index].stroke).alpha(vm.opacity).rgbString();
+							ctx.fillRect(vm.x + vm.xPadding - 1, this.getLineHeight(index + 1) - vm.fontSize / 2 - 1, vm.fontSize + 2, vm.fontSize + 2);
 
-						ctx.fillStyle = helpers.color(vm.legendColors[index].stroke).alpha(vm.opacity).rgbString();
-						ctx.fillRect(vm.x + vm.xPadding - 1, this.getLineHeight(index + 1) - vm.fontSize / 2 - 1, vm.fontSize + 2, vm.fontSize + 2);
+							ctx.fillStyle = helpers.color(vm.legendColors[index].fill).alpha(vm.opacity).rgbString();
+							ctx.fillRect(vm.x + vm.xPadding, this.getLineHeight(index + 1) - vm.fontSize / 2, vm.fontSize, vm.fontSize);
+						}
 
-						ctx.fillStyle = helpers.color(vm.legendColors[index].fill).alpha(vm.opacity).rgbString();
-						ctx.fillRect(vm.x + vm.xPadding, this.getLineHeight(index + 1) - vm.fontSize / 2, vm.fontSize, vm.fontSize);
 
 
 					}, this);
