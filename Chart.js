@@ -2590,6 +2590,12 @@
 			'<%=value %>'
 		].join(''),
 		multiKeyBackground: '#fff',
+		time: {
+			format: false, // false == date objects or use pattern string from http://momentjs.com/docs/#/parsing/string-format/
+			unit: false, // false == automatic or override with week, month, year, etc.
+			round: false, // none, or override with week, month, year, etc.
+			displayFormat: 'MM/DD/YYYY HH:mm',
+		},		
 	};
 
 	Chart.Tooltip = Chart.Element.extend({
@@ -2722,8 +2728,12 @@
 						y: medianPosition.y,
 						labels: labels,
 						title: (function() {
+							var tt = this._data.labels[this._active[0]._index];
+							if (typeof this._options.tooltips.time.format !== 'string' && this._options.tooltips.time.format.call) {
+								tt = this._options.tooltips.time.format(tt);
+							}							
 							return this._data.timeLabels ? this._data.timeLabels[this._active[0]._index] :
-								(this._data.labels && this._data.labels.length) ? this._data.labels[this._active[0]._index] :
+								(this._data.labels && this._data.labels.length) ? tt.format(this._options.tooltips.time.displayFormat) :
 								'';
 						}).call(this),
 						legendColors: colors,
